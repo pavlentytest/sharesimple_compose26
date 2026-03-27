@@ -32,59 +32,6 @@ import com.example.myapplication.presentation.modelview.ShareViewModel
 
 @Composable
 fun ShareNoteScreen() {
-    val context = LocalContext.current
 
-    val repository = remember { ShareRepositoryImpl(context) }
-    val useCase = remember { ShareNoteUseCase(repository, context) }
 
-    val viewModel: ShareViewModel = viewModel(
-        factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ShareViewModel(useCase) as T
-            }
-        }
-    )
-
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-    var noteContent by remember { mutableStateOf("Текст заметки для шаринга...") }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Шаринг файла", style = MaterialTheme.typography.headlineMedium)
-
-            OutlinedTextField(
-                value = noteContent,
-                onValueChange = { noteContent = it },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Button(
-                onClick = { viewModel.shareNote(Note(noteContent)) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Поделиться через Share Sheet")
-            }
-
-            when (val s = state) {
-                is ShareUiState.Sharing -> CircularProgressIndicator()
-                is ShareUiState.Success -> Text(
-                    s.message,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                is ShareUiState.Error -> Text(s.message, color = MaterialTheme.colorScheme.error)
-                else -> {}
-            }
-        }
-    }
 }
